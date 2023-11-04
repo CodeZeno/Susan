@@ -125,15 +125,15 @@ class ForgeAgent(Agent):
         """
 
 	# Get this step's task from the database
-        task = await self.db.get_task(task_id)
+	task = await self.db.get_task(task_id)
 
 	# Create a new step in the database
-        step = await self.db.create_step(
-            task_id=task_id, input=step_request, is_last=True
-        )
+	step = await self.db.create_step(
+		task_id=task_id, input=step_request, is_last=True
+	)
 
 	# Log the message
-    	LOG.info(f"\t✅ Final Step completed: {step.step_id} input: {step.input[:19]}")
+	LOG.info(f"\t✅ Final Step completed: {step.step_id} input: {step.input[:19]}")
 
 	# Initialise the prompt engine
 	prompt_engine = PromptEngine("gpt-3.5-turbo")
@@ -156,39 +156,39 @@ class ForgeAgent(Agent):
 	task_prompt = prompt_engine.load_prompt("task-step", **task_kwargs)
 
 	# Append the task prompt to the messages list
-    	messages.append({"role": "user", "content": task_prompt})
+	messages.append({"role": "user", "content": task_prompt})
 
 	try:
 		# Define the parameters for the chat completion request
 		chat_completion_kwargs = {
-          		"messages": messages,
-          		"model": "gpt-3.5-turbo",
-      		}
-      		# Make the chat completion request and parse the response
-      		chat_response = await chat_completion_request(**chat_completion_kwargs)
-      		answer = json.loads(chat_response["choices"][0]["message"]["content"])
+			"messages": messages,
+			"model": "gpt-3.5-turbo",
+		}
+		# Make the chat completion request and parse the response
+		chat_response = await chat_completion_request(**chat_completion_kwargs)
+		answer = json.loads(chat_response["choices"][0]["message"]["content"])
 
-      		# Log the answer for debugging purposes
-      		LOG.info(pprint.pformat(answer))
+		# Log the answer for debugging purposes
+		LOG.info(pprint.pformat(answer))
 
 	except json.JSONDecodeError as e:
 		# Handle JSON decoding errors
 		LOG.error(f"Unable to decode chat response: {chat_response}")
 	except Exception as e:
 		# Handle other exceptions
-		LOG.error(f"Unable to generate chat response: {e}")Step 7: Executing the Derived Ability
+		LOG.error(f"Unable to generate chat response: {e}")
 
 	# Extract the ability from the answer
-    	ability = answer["ability"]
+	ability = answer["ability"]
 
-    	# Run the ability and get the output
-    	# We don't actually use the output in this example
-    	output = await self.abilities.run_ability(
-        	task_id, ability["name"], **ability["args"]
-    	)
+	# Run the ability and get the output
+	# We don't actually use the output in this example
+	output = await self.abilities.run_ability(
+		task_id, ability["name"], **ability["args"]
+	)
 
-    	# Set the step output to the "speak" part of the answer
-    	step.output = answer["thoughts"]["speak"]
+	# Set the step output to the "speak" part of the answer
+	step.output = answer["thoughts"]["speak"]
 
 	# Return the completed step
-    	return step
+	return step
