@@ -10,6 +10,50 @@ Hey there! Ready for part 3 of our AutoGPT Forge tutorial series? If you missed 
 
 Now, let's get hands-on! We'll use an LLM to power our agent and complete a task. The challenge? Making the agent write "Washington" to a .txt file. We won't give it step-by-step instructions—just the task. Let's see our agent in action and watch it figure out the steps on its own!
 
+After taking your first steps into the realm of AutoGPT Forge and unraveling the blueprint of an AI agent, you’re now poised to delve deeper. This next phase of our guide is centered around the hands-on aspect of the journey, emphasizing the practicalities of agent interaction using the user interface.
+
+In this tutorial, we’ll guide you step-by-step on how to efficiently communicate with your agent through the UI, ensuring that you can not only create tasks but also monitor and analyze them seamlessly. Moreover, the significance of benchmarks in the AI ecosystem cannot be understated. Thus, we’ll walk you through the process of running benchmarks, understanding your agents performance, and critically, showcasing how to submit those all-important scores to the leaderboard.
+
+This guide is designed to transition your theoretical knowledge into tangible skills. By the end, you should feel confident in navigating the AutoGPT Forge UI, conducting benchmarks, and participating competitively on the leaderboard.
+
+So, with the foundational understanding in place from our previous tutorials, let’s venture further and master the interactive world of AutoGPT Forge. Let’s get started!
+
+## Initiating the Agent
+
+Before we dive into the UI, ensure your agent is up and running.
+
+In the terminal, navigate to the root of the repository you cloned during our introductory tutorial. If you missed this step or need a refresher, you can [follow along with our initial guide here](https://medium.com/@aiedge/autogpt-forge-a-comprehensive-guide-to-your-first-steps-a1dfdf46e3b4).
+
+Execute the following command to start your agent:
+```bash
+./run agent start agent_name
+```
+
+Make sure to replace agent_name with the name of your specific agent.
+
+## Accessing the AutoGPT UI
+
+Once your agent is running, open up your preferred web browser and navigate to the AutoGPT UI, you can find it at http://localhost:8000 . The above screenshot is what you’ll be greeted with — the login screen for AutoGPT UI.
+
+To access the UI, authenticate using either your GitHub or Google account. These platforms ensure a secure login process.
+
+## The Task Screen
+
+Upon successful authentication, you’ll be directed to the main hub of the UI: the task screen.
+
+The design is reminiscent of ChatGPT, providing a chat-like interface. Those familiar with ChatGPT will find this layout intuitive.
+
+Let’s break down the components of this screen:
+
+Side Navigation: On the top-left, you’ll notice three primary buttons:
+
+Tasks: This is your current screen, where you interact with and monitor tasks.
+Benchmarking: Transition to this section when you’re ready to run benchmarks on your agent.
+Settings: Here, you can adjust preferences, manage agent configurations, and customize the UI experience.
+The main screen area is split into two sections:
+
+Tasks List: Just to the right of the Side Nav Bar, this section lists all the tasks or benchmark test suites you’ve run. It offers a concise view of previous interactions, making it easier to revisit or analyze specific tasks.
+Task Interface: On the right side of the screen, you’ll find the main interaction space. Input tasks, view agent responses, or monitor ongoing tasks in real-time from this panel.
 
 ## Get Your Smart Agent Project Ready
 

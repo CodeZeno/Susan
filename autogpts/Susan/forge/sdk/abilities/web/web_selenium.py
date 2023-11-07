@@ -83,6 +83,7 @@ def validate_url(func: Callable[..., Any]) -> Any:
 
     @functools.wraps(func)
     def wrapper(url: str, *args, **kwargs) -> Any:
+        print(f"url: {url}")
         """Check if the URL is valid using a basic check, urllib check, and local file check
 
         Args:
@@ -190,7 +191,7 @@ LINKS_TO_RETURN = 20
 class BrowsingError(CommandExecutionError):
     """An error occurred while trying to browse the page"""
 
-
+"""
 @ability(
     name="read_webpage",
     description="Read a webpage, and extract specific information from it if a question is specified. If you are looking to extract specific information from the webpage, you should specify a question.",
@@ -210,17 +211,11 @@ class BrowsingError(CommandExecutionError):
     ],
     output_type="string",
 )
-@validate_url
-async def read_webpage(agent, task_id: str, url: str, question: str = "") -> Tuple(str, List[str]):
-    """Browse a website and return the answer and links to the user
-
-    Args:
-        url (str): The url of the website to browse
-        question (str): The question to answer using the content of the webpage
-
-    Returns:
-        str: The answer and links to the user and the webdriver
-    """
+"""
+#@validate_url
+"""
+async def read_webpage(agent, task_id: str, url: str, question: str = "") -> str:
+    print(f"url: { url }")
     driver = None
     try:
         driver = open_page_in_browser(url)
@@ -249,7 +244,7 @@ async def read_webpage(agent, task_id: str, url: str, question: str = "") -> Tup
     finally:
         if driver:
             close_browser(driver)
-
+"""
 
 def scrape_text_with_selenium(driver: WebDriver) -> str:
     """Scrape text from a browser window using selenium

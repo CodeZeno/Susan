@@ -6,6 +6,8 @@ from typing import Any, Callable, List
 
 import pydantic
 
+import traceback
+
 
 class AbilityParameter(pydantic.BaseModel):
     """
@@ -159,28 +161,16 @@ class AbilityRegister:
     async def run_ability(
         self, task_id: str, ability_name: str, *args: Any, **kwds: Any
     ) -> Any:
-        """
-        This method runs a specified ability with the provided arguments and keyword arguments.
-
-        The agent is passed as the first argument to the ability. This allows the ability to access and manipulate
-        the agent's state as needed.
-
-        Args:
-            task_id (str): The ID of the task that the ability is being run for.
-            ability_name (str): The name of the ability to run.
-            *args: Variable length argument list.
-            **kwds: Arbitrary keyword arguments.
-
-        Returns:
-            Any: The result of the ability execution.
-
-        Raises:
-            Exception: If there is an error in running the ability.
-        """
+        print(f"task_id: { task_id }")
+        print(f"ability_name: { ability_name }")
+        print(f"args: { args }")
+        print(f"kwds: { kwds }")
         try:
-            ability = self.abilities[ability_name]
-            return await ability(self.agent, task_id, *args, **kwds)
-        except Exception:
+            call_ability = self.abilities[ability_name]    
+            return await call_ability(self.agent, task_id, *args, **kwds)
+            #return await call_ability(self.agent, task_id, url="https://silennaihin.com/random/plain.html", question="what is this page?")
+        except Exception as e:
+            traceback.print_exc()
             raise
 
 

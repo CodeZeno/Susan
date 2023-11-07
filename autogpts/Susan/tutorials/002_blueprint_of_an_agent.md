@@ -11,7 +11,15 @@
 
 
 
+Hello there, fellow pioneers of the AI frontier!
 
+If you’ve landed here, chances are you’ve been bitten by the AI bug, eager to harness the incredible power of Large Language Models (LLMs) to build your own intelligent agents, commonly known as AutoGPTs. Remember the thrill when we set up our first project in the initial tutorial? Well, buckle up, because things are about to get even more exciting!
+
+In this tutorial — [the sequel to our AI adventure](https://aiedge.medium.com/autogpt-forge-a-comprehensive-guide-to-your-first-steps-a1dfdf46e3b4) — we're going to embark on a journey into the very heart of an AI agent. Imagine peeling back the layers of an onion, but instead of tears, there’s a wealth of knowledge waiting at each layer. We’ll explore the intricate web of components that make these agents tick, take a guided tour of the revered AutoGPT Forge's project structure, and yes, get our hands back into the coding trenches to enhance the step function.
+
+By the time we wrap up, you won’t just have a working LLM-powered agent; you’ll have one that passes the essential “write file” test, a testament to your growing prowess in the world of AI development.
+
+So, my fellow agent developers, are you ready to leap into this world where code meets cognition? Let the exploration begin!
 
 ## What are LLM-Based AI Agents?
 
@@ -23,6 +31,9 @@ Traditional autonomous agents operated with limited knowledge, often confined to
 
 ![AI visualising AI researchers hard at work](../../../docs/content/imgs/quickstart/t2_02.png)
 
+The [Agent Landscape Survey](https://arxiv.org/abs/2308.11432) underscores this evolution, detailing the remarkable potential LLMs have shown in achieving human-like intelligence. They’re not just about more data; they represent a more holistic approach to AI, bridging gaps between isolated task knowledge and expansive web information.
+
+Further expanding on this, [The Rise and Potential of Large Language Model Based Agents: A Survey](https://arxiv.org/abs/2309.07864) portrays LLMs as the foundational blocks for the next generation of AI agents. These agents sense, decide, and act, all backed by the comprehensive knowledge and adaptability of LLMs. It is an incrediable source of knowledge on AI Agent Research with almost 700 papers referenced and organised by reseach area.
 
 ## The Anatomy of an LLM-Based AI Agent
 
@@ -143,5 +154,14 @@ Configuration is key to ensuring our agent runs seamlessly. The .env.example fil
     - **agent.py**: Houses the agent's core logic.
     - **prompts**: Directory of templates aiding LLM logic.
     - **sdk**: Boilerplate code and essential APIs.
+
+Wrapping Up: From Blueprint to Reality
+And there we have it — a comprehensive dive into the world of AutoGPTs. We’ve traversed the intricate pathways of agent anatomy, understood how the Agent Protocol fits in, and peeked under the hood of the Forge, understanding its core components and structure.
+
+If this tutorial was a journey, think of it as a hike up a mountain. We started at the base, with a broad view of LLM-based AI agents, understanding their significance and potential. As we climbed, the trail led us to the anatomy of these agents, dissecting their structure and functionality. Nearing the summit, we delved into the Agent Protocol, understanding its pivotal role in standardizing communication. And finally, standing at the peak, we had a bird’s-eye view of the Forge, observing its organized layout and appreciating its design intricacies.
+
+But remember, every mountain peak is the bottom of another adventure. Having grasped the theoretical aspects, it’s time to transition from blueprint to reality. Now the foundations have laid, our next steps involve breathing life into these concepts, turning lines of code into intelligent, responsive agents.
+
+To all the budding agent developers out there, gear up for the next phase of our expedition — the hands-on time! Until then, keep the AI flame burning bright and never stop exploring.
 
 Let's put this blueprint into practice in part 3!
