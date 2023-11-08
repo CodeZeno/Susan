@@ -54,8 +54,14 @@ class ForgeAgent(Agent):
         task = await self.db.get_task(task_id)
 
         # Create a new step in the database
+        last_step = False
+
+        LOG.info(f"step_request: { step_request }")
+
+        if step_request.input == None or len(step_request.input) == 5:
+             last_step = True
         step = await self.db.create_step(
-            task_id=task_id, input=step_request, is_last=True
+            task_id=task_id, input=step_request, is_last=last_step
         )
 
         # Log the message
@@ -86,6 +92,7 @@ class ForgeAgent(Agent):
         # Append the task prompt to the messages list
         messages.append({"role": "user", "content": task_prompt})
 
+        """
         try:
             # Define the parameters for the chat completion request
             chat_completion_kwargs = {
@@ -105,6 +112,21 @@ class ForgeAgent(Agent):
         except Exception as e:
             # Handle other exceptions
             LOG.error(f"Unable to generate chat response: {e}")
+        """
+
+        LOG.info(f"step: { step }")
+
+        step_name = "step1"
+        if step.is_last:
+            step_name = "step2"
+        answer = {
+            "ability": {
+                "name": step_name,
+                "args": {
+                    "word": step_request.input
+                }
+            }
+        }
 
         # Verify that ability is valid and run it
         if "ability" in answer:
@@ -125,6 +147,10 @@ class ForgeAgent(Agent):
         if not step.output:
             # Set the step output to the "speak" part of the answer
             step.output = answer["thoughts"]["speak"]
+
+        step = await self.db.update_step(
+            task_id=task_id, step_id=step.step_id, status="completed", output=step.output
+        )
 
         # Return the completed step
         return step

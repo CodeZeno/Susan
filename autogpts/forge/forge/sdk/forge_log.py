@@ -4,6 +4,7 @@ import logging.config
 import logging.handlers
 import os
 import queue
+import time
 
 JSON_LOGGING = os.environ.get("JSON_LOGGING", "false").lower() == "true"
 
@@ -107,7 +108,7 @@ class ForgeLogger(logging.Logger):
     """
 
     CONSOLE_FORMAT: str = (
-        "[%(asctime)s] [$BOLD%(name)-15s$RESET] [%(levelname)-8s]\t%(message)s"
+        f"{time.strftime('%H:%M:%S')}[$BOLD%(name)-18s$RESET][%(levelname)-8s]\t%(message)s"
     )
     FORMAT: str = "%(asctime)s %(name)-15s %(levelname)-8s %(message)s"
     COLOR_FORMAT: str = formatter_message(CONSOLE_FORMAT, True)

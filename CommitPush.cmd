@@ -1,5 +1,5 @@
-for %%* in (.) do SET version=%%~nx* v0.02
-SET comment=Added fetch webpage ability.
+for %%* in (.) do SET version=%%~nx* v0.03
+SET comment=Now saving agent responses.
 git add -A
 git commit -a -m "%version%" -m "" -m "%comment%"
 git push

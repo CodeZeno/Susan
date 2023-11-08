@@ -1,1 +1,2 @@
-wsl -d Ubuntu-22.04 --cd /home/craig/Susan
+cd "%cd%"
+cmd /k

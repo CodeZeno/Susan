@@ -86,7 +86,7 @@ def ability(
         func_param_names = set(func_params.keys())
         if param_names != func_param_names:
             raise ValueError(
-                f"Mismatch in parameter names. Ability Annotation includes {param_names}, but function acatually takes {func_param_names} in function {func.__name__} signature"
+                f"Mismatch in parameter names. Ability Annotation includes {param_names}, but function actually takes {func_param_names} in function {func.__name__} signature"
             )
         func.ability = Ability(
             name=name,
@@ -161,15 +161,15 @@ class AbilityRegister:
     async def run_ability(
         self, task_id: str, ability_name: str, *args: Any, **kwds: Any
     ) -> Any:
-        print(f"task_id: { task_id }")
-        print(f"ability_name: { ability_name }")
-        print(f"args: { args }")
-        print(f"kwds: { kwds }")
+        #print(f"task_id: { task_id }")
+        #print(f"ability_name: { ability_name }")
+        #print(f"args: { args }")
+        #print(f"kwds: { kwds }")
         try:
             call_ability = self.abilities[ability_name]    
             return await call_ability(self.agent, task_id, *args, **kwds)
-            #return await call_ability(self.agent, task_id, url="https://silennaihin.com/random/plain.html", question="what is this page?")
         except Exception as e:
+            print(f"run_ability error: {e}")
             traceback.print_exc()
             raise
 

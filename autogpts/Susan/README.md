@@ -1,5 +1,11 @@
 # 🚀 **AutoGPT-Forge**: Build Your Own AutoGPT Agent! 🧠 
 
+
+ip addr show eth0
+sudo service ssh start
+
+
+
 ### 🌌 Dive into the Universe of AutoGPT Creation! 🌌
 
 Ever dreamt of becoming the genius behind an AI agent? Dive into the *Forge*, where **you** become the creator!
