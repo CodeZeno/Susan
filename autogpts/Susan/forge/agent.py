@@ -91,14 +91,12 @@ class ForgeAgent(Agent):
         step.output = test
         return step
         """
-
+        print("starting...:")
         task = await self.db.get_task(task_id)
         
         new_messages = []
         old_messages = await self.db.get_chat_history(task_id)
-
-        #LOG.info("old_messages:")
-        #print(json.dumps(old_messages, indent=4))
+        print("old_messages:", json.dumps(old_messages, indent=2))
 
         last_step = True
 
@@ -116,18 +114,16 @@ class ForgeAgent(Agent):
             input=step_request,
             is_last=last_step
         )
-
-        #LOG.info("new_messages:")
-        #print(json.dumps(new_messages, indent=4))
         
         llm_request = {
             "model": self.llm_model,
+            "response_format": { "type": "json_object" },
             "messages": old_messages + new_messages,
             "tools": self.abilities.list_abilities_for_tools(),
             "tool_choice": "auto"
         }
         print("LLM Request:", json.dumps(llm_request, indent=2))
-        #LOG.info(f"LLM Request: { llm_request }")
+
         try:
             llm_response = await chat_completion_request(**llm_request)
             answer = llm_response["choices"][0]["message"]
@@ -157,6 +153,7 @@ class ForgeAgent(Agent):
 
             llm_request_with_answers = {
                 "model": self.llm_model,
+                "response_format": { "type": "json_object" },
                 "messages": old_messages + new_messages
             }
             print("LLM Final Request:", json.dumps(llm_request_with_answers, indent=2))
@@ -175,7 +172,13 @@ class ForgeAgent(Agent):
         else:
             step.output = answer["content"]
 
-        await self.db.add_chat_history(task_id=task_id, messages=new_messages)
+        # filter out tool_calls as they have no content
+        filtered_messages = [msg for msg in new_messages if not (msg.get("role") == "assistant" and "tool_calls" in msg)]
+        # filter out tool as they must match a tool_call
+        filtered_messages = [msg for msg in filtered_messages if msg.get("role") != "tool"]
+
+        # Save filtered messages to DB, this will have all we need for history
+        await self.db.add_chat_history(task_id=task_id, messages=filtered_messages)
 
         step = await self.db.update_step(
             task_id=task_id,
