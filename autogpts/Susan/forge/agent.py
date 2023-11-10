@@ -91,7 +91,6 @@ class ForgeAgent(Agent):
         step.output = test
         return step
         """
-        print("starting...:")
         task = await self.db.get_task(task_id)
         
         new_messages = []
@@ -164,20 +163,18 @@ class ForgeAgent(Agent):
 
         if output := json.loads(answer.get("content")):
             if plan := output.get("plan"):
-                LOG.info(f"Houston we have a plan { plan }")
-                #step.output = plan + response
-                #modify output with plan steps
+                step.output = output.get("response") + self.format_plan(plan)
             else:
                 step.output = output.get("response")
         else:
             step.output = answer["content"]
 
-        # filter out tool_calls as they have no content
+        # Filter out messages with tool_calls as they have no content
         filtered_messages = [msg for msg in new_messages if not (msg.get("role") == "assistant" and "tool_calls" in msg)]
-        # filter out tool as they must match a tool_call
+        # Filter out messages with the tool role as they must accompany the above
         filtered_messages = [msg for msg in filtered_messages if msg.get("role") != "tool"]
 
-        # Save filtered messages to DB, this will have all we need for history
+        # Save filtered messages to database, this will have all we need for history
         await self.db.add_chat_history(task_id=task_id, messages=filtered_messages)
 
         step = await self.db.update_step(
@@ -189,3 +186,9 @@ class ForgeAgent(Agent):
 
         # Return the completed step
         return step
+
+    def format_plan(self, steps: dict):
+        response = ""
+        for step in steps:
+            response += "\n\n\n**"+step["name"]+"**\n\n"+step["description"]
+        return response
