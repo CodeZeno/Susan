@@ -1,0 +1,11 @@
+{% extends "techniques/expert.j2" %}
+{% block expert %}Planning{% endblock %}
+{% block prompt %}
+Your task is:
+
+{{ task }}
+
+Answer in the provided format.
+
+Your decisions must always be made independently without seeking user assistance. Play to your strengths as an LLM and pursue simple strategies.
+{% endblock %}

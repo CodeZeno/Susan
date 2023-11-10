@@ -17,7 +17,6 @@ import pprint
 
 LOG = ForgeLogger(__name__)
 
-
 class ForgeAgent(Agent):
     def __init__(self, database: AgentDB, workspace: Workspace):
         """
@@ -27,6 +26,8 @@ class ForgeAgent(Agent):
         Feel free to create subclasses of the database and workspace to implement your own storage
         """
         super().__init__(database, workspace)
+        self.llm_model = "gpt-3.5-turbo-1106";
+        self.prompt_engine = PromptEngine(self.llm_model)
 
     async def create_task(self, task_request: TaskRequestBody) -> Task:
         """
@@ -44,112 +45,143 @@ class ForgeAgent(Agent):
         return task
 
     async def execute_step(self, task_id: str, step_request: StepRequestBody) -> Step:
-
         """
-        Need to get Susan to create a plan with steps and the ability she will need for each (Max 1 ability per step)
-        
-        """
-
-        # Get this step's task from the database
-        task = await self.db.get_task(task_id)
-
-        # Create a new step in the database
-        last_step = False
-
-        LOG.info(f"step_request: { step_request }")
-
-        if step_request.input == None or len(step_request.input) == 5:
-             last_step = True
+        #Testing code
+        test_req = {
+            "model": "gpt-3.5-turbo-1106",
+            "response_format": { "type": "json_object" },
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "Ensure your reply is valid JSON with these parameters:\n'response' - Your response to the user.\n'plan' - An optional array of steps with each step having a 'name' and 'description'. Use the 'plan' parameter if the request requires multiple steps or tasks to complete the goal.\nYou may alternatively use any of the tools available if you feel they are needed."
+                },
+                {
+                    "role": "user",
+                    "content": "Answer as an expert in Planning. \nYour task is:\n\nWhat is the capital of Australia?\n\nAnswer in the provided format.\n\nYour decisions must always be made independently without seeking user assistance. Play to your strengths as an LLM and pursue simple strategies.\n"
+                }
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "get_pizza",
+                        "description": "Get the users favorite pizza",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "pizza": {
+                                    "type": "string",
+                                    "description": "The name of their favorite pizza."
+                                }
+                            },
+                            "required": ["pizza"]
+                        }
+                    }
+                }
+            ],
+            "tool_choice": "none"
+        }
         step = await self.db.create_step(
-            task_id=task_id, input=step_request, is_last=last_step
+            task_id=task_id,
+            input=step_request,
+            is_last=True
+        )
+        test = await chat_completion_request(**test_req)
+        print(json.dumps(test, indent=4))
+        step.output = test
+        return step
+        """
+
+        task = await self.db.get_task(task_id)
+        
+        new_messages = []
+        old_messages = await self.db.get_chat_history(task_id)
+
+        #LOG.info("old_messages:")
+        #print(json.dumps(old_messages, indent=4))
+
+        last_step = True
+
+        if not old_messages: # First run
+            system_prompt = self.prompt_engine.load_prompt("system")
+            user_prompt = self.prompt_engine.load_prompt("plan", task=task.input)
+            new_messages.append({"role": "system", "content": system_prompt})
+            new_messages.append({"role": "user", "content": user_prompt})
+            last_step = False
+        elif step_request.input:
+            new_messages.append({ "role":"user", "content":step_request.input })
+
+        step = await self.db.create_step(
+            task_id=task_id,
+            input=step_request,
+            is_last=last_step
         )
 
-        # Log the message
-        #LOG.info(f"\t✅ Final Step completed: {step.step_id} input: {step.input[:19]}")
-
-        # Initialise the prompt engine
-        prompt_engine = PromptEngine("gpt-3.5-turbo")
-
-        # Load a prompt from a file
-        system_prompt = prompt_engine.load_prompt("system-format")
-
-        # Initialize the messages list with the system prompt
-        messages = [
-            {"role": "system", "content": system_prompt},
-        ]
-
-        # Define the task parameters
-        task_kwargs = {
-            "task": task.input,
-            "abilities": self.abilities.list_abilities_for_prompt(),
+        #LOG.info("new_messages:")
+        #print(json.dumps(new_messages, indent=4))
+        
+        llm_request = {
+            "model": self.llm_model,
+            "messages": old_messages + new_messages,
+            "tools": self.abilities.list_abilities_for_tools(),
+            "tool_choice": "auto"
         }
-
-        #LOG.info("List of abilities: %s", task_kwargs["abilities"])
-
-        # Load the task prompt with the defined task parameters
-        task_prompt = prompt_engine.load_prompt("task-step", **task_kwargs)
-
-        # Append the task prompt to the messages list
-        messages.append({"role": "user", "content": task_prompt})
-
-        """
+        print("LLM Request:", json.dumps(llm_request, indent=2))
+        #LOG.info(f"LLM Request: { llm_request }")
         try:
-            # Define the parameters for the chat completion request
-            chat_completion_kwargs = {
-                "messages": messages,
-                "model": "gpt-3.5-turbo",
-            }
-            # Make the chat completion request and parse the response
-            chat_response = await chat_completion_request(**chat_completion_kwargs)
-            answer = json.loads(chat_response["choices"][0]["message"]["content"])
-
-            # Log the answer for debugging purposes
-            LOG.info(pprint.pformat(answer))
-
-        except json.JSONDecodeError as e:
-            # Handle JSON decoding errors
-            LOG.error(f"Unable to decode chat response: {chat_response}")
+            llm_response = await chat_completion_request(**llm_request)
+            answer = llm_response["choices"][0]["message"]
+            new_messages.append(answer)
+            print("LLM Answer:", json.dumps(answer, indent=2))
         except Exception as e:
-            # Handle other exceptions
-            LOG.error(f"Unable to generate chat response: {e}")
-        """
-
-        LOG.info(f"step: { step }")
-
-        step_name = "step1"
-        if step.is_last:
-            step_name = "step2"
-        answer = {
-            "ability": {
-                "name": step_name,
-                "args": {
-                    "word": step_request.input
-                }
-            }
-        }
-
-        # Verify that ability is valid and run it
-        if "ability" in answer:
-            ability = answer["ability"]
-            if ability["name"] in self.abilities.abilities:
-                LOG.info(f"Running ability: { ability['name'] }")
+            LOG.error(f"Unable to communicate with {self.prompt_engine}: {e}")
+            raise
+        
+        plan = []
+        if tools := answer.get("tool_calls"):
+            for tool in tools:
+                ability = tool["function"]
                 try:
-                    # todo: store step output? create the next step?
-                    step.output = await self.abilities.run_ability(
-                        task_id, ability['name'], **ability["args"]
+                    ability_result = await self.abilities.run_ability(
+                        task_id, ability["name"], **json.loads(ability["arguments"])
                     )
-                    LOG.info(f"output: { step.output }")
+                    new_messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool["id"],
+                            "content": ability_result
+                        }
+                    )
                 except Exception as e:
-                    LOG.error(f"Unable to run ability({ ability['name'] }): {e}")
-            else:
-                LOG.error(f"Unknown ability: { ability['name'] }")
+                    LOG.info(f"Problem running ability { ability['name'] }: { e }")
 
-        if not step.output:
-            # Set the step output to the "speak" part of the answer
-            step.output = answer["thoughts"]["speak"]
+            llm_request_with_answers = {
+                "model": self.llm_model,
+                "messages": old_messages + new_messages
+            }
+            print("LLM Final Request:", json.dumps(llm_request_with_answers, indent=2))
+            llm_response_final = await chat_completion_request(**llm_request_with_answers)
+            answer = llm_response_final["choices"][0]["message"]
+            new_messages.append(answer)
+            print("LLM Final Response:", json.dumps(answer, indent=2))
+
+        if output := json.loads(answer.get("content")):
+            if plan := output.get("plan"):
+                LOG.info(f"Houston we have a plan { plan }")
+                #step.output = plan + response
+                #modify output with plan steps
+            else:
+                step.output = output.get("response")
+        else:
+            step.output = answer["content"]
+
+        await self.db.add_chat_history(task_id=task_id, messages=new_messages)
 
         step = await self.db.update_step(
-            task_id=task_id, step_id=step.step_id, status="completed", output=step.output
+            task_id=task_id,
+            step_id=step.step_id,
+            status="completed",
+            output=step.output
         )
 
         # Return the completed step

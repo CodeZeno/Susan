@@ -141,6 +141,37 @@ class AbilityRegister:
     def list_abilities_for_prompt(self) -> List[str]:
         return [str(ability) for ability in self.abilities.values()]
 
+    def list_abilities_for_tools(self) -> dict[str, Any]:
+        abilities = []
+        types = ["string","number","integer","object","array","boolean","null"] # https://json-schema.org/understanding-json-schema/reference/type
+        for ability in self.abilities.values():
+            properties = {}
+            required = []
+            for parameter in ability.parameters:
+                if not parameter.type in types:
+                    parameter.type = "string" # To handle things like bytes etc
+                properties[parameter.name] = {
+                    "type": parameter.type,
+                    "description": parameter.description,
+                }
+                if parameter.required:
+                    required.append(parameter.name)
+            abilities.append(
+                {
+                    "type": "function",
+                    "function": {
+                        "name": ability.name,
+                        "description": ability.description,
+                        "parameters": {
+                            "type": "object",
+                            "properties": properties,
+                            "required": required
+                        },
+                    },
+                }
+            )
+        return abilities
+
     def abilities_description(self) -> str:
         abilities_by_category = {}
         for ability in self.abilities.values():

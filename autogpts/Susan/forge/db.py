@@ -80,10 +80,11 @@ class ForgeDatabase(AgentDB):
                     return [{"role": m.role, "content": m.content} for m in messages]
 
                 else:
-                    LOG.error(
+                    LOG.info(
                         f"Chat history not found with task_id: {task_id}"
                     )
-                    raise NotFoundError("Chat history not found")
+                    return []
+                    #raise NotFoundError("Chat history not found")
         except SQLAlchemyError as e:
             LOG.error(f"SQLAlchemy error while getting chat history: {e}")
             raise
