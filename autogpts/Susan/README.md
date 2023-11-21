@@ -1,7 +1,13 @@
 # 🚀 **AutoGPT-Forge**: Build Your Own AutoGPT Agent! 🧠 
 
 
+
+#Get the current IP Address:
 ip addr show eth0
+
+#Update sftp-config.json
+
+#start ssh
 sudo service ssh start
 
 
