@@ -15,6 +15,7 @@
 	```
 
 	Replace "Ubuntu" with the name of your installed distro.
+
 	Use `wsl --list` to see currently installed distributions.
 
 2. Update your distro
@@ -45,7 +46,9 @@
 	```
 
 	[Visit GitHub](https://github.com/settings/ssh/new)
+
 	Add a title e.g. WSL2 AutoGPT
+	
 	Copy the above text "ssh-ed255..." and paste it to the Key field and click "Add SSH key"
 
 6. Add the ssh key to your system
